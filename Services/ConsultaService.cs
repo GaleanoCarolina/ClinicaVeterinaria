@@ -566,10 +566,12 @@ public sealed class ConsultaService
 
     private static int ExigirVeterinarioAsociado()
     {
+        // Solo el veterinario puede consultar o cerrar una atención clínica.
+        // El administrador administra datos, pero no debe registrar consultas clínicas.
+        if (!SesionActual.EsRol("Veterinario"))
+            throw new UnauthorizedAccessException("La atención clínica solo puede realizarse con el rol Veterinario.");
         if (!SesionActual.HaySesion || SesionActual.Usuario is null || !SesionActual.Usuario.IdVeterinario.HasValue)
             throw new UnauthorizedAccessException("Para registrar atención clínica, el usuario debe estar asociado a un veterinario activo.");
-        if (!SesionActual.EsRol("Veterinario", "Administrador"))
-            throw new UnauthorizedAccessException("El rol actual no está autorizado para registrar atención clínica.");
         return SesionActual.Usuario.IdVeterinario.Value;
     }
 

@@ -235,6 +235,18 @@ public sealed class FormMenuPrincipal : Form
 
     private void AbrirAtencionClinica()
     {
+        // La atención clínica registra y finaliza consultas; esta operación es exclusiva del veterinario.
+        // Se valida antes de construir el formulario para evitar excepciones al usuario administrador.
+        if (!SesionActual.EsRol("Veterinario"))
+        {
+            MessageBox.Show(
+                "La atención clínica solo puede utilizarse al iniciar sesión como Veterinario.",
+                "Acceso restringido",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+            return;
+        }
+
         MostrarFormulario(new FormAtencionClinica(), _botonesModulo["Atención Clínica"]);
     }
 

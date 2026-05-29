@@ -1,12 +1,21 @@
+// VERSION CORREGIDA PDF REAL - SIN AVISO TEMPORAL - 2026-05-29
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using ClinicaVeterinaria.Models;
 using ClinicaVeterinaria.Services;
 using ClinicaVeterinaria.Utils;
+using iText.IO.Font.Constants;
+using iText.Kernel.Font;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Layout.Properties;
 
 namespace ClinicaVeterinaria.Forms;
 
@@ -72,7 +81,7 @@ public sealed class FormAtencionClinica : Form
             Padding = new Padding(8),
             BackColor = UiTheme.Fondo
         };
-        principal.RowStyles.Add(new RowStyle(SizeType.Absolute, 118F));
+        principal.RowStyles.Add(new RowStyle(SizeType.Absolute, 142F));
         principal.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         Controls.Add(principal);
         principal.Controls.Add(ConstruirEncabezado(), 0, 0);
@@ -81,12 +90,91 @@ public sealed class FormAtencionClinica : Form
 
     private Control ConstruirEncabezado()
     {
-        Panel panel = new() { Dock = DockStyle.Fill, BackColor = Color.White, Padding = new Padding(18, 12, 18, 10), Margin = new Padding(0, 0, 0, 8) };
-        _lblPaciente = new Label { AutoSize = true, Text = "Seleccione un paciente en consulta", Font = new Font("Segoe UI Semibold", 17F, FontStyle.Bold), ForeColor = UiTheme.Primario, Location = new Point(18, 10) };
-        _lblDetalle = new Label { AutoSize = true, Text = "", ForeColor = UiTheme.TextoSecundario, Location = new Point(20, 48) };
-        _lblCita = new Label { AutoSize = true, Text = "", ForeColor = UiTheme.TextoSecundario, Location = new Point(20, 74) };
-        _lblAlertas = new Label { AutoEllipsis = true, Width = 530, Height = 68, TextAlign = ContentAlignment.MiddleLeft, Font = UiTheme.FuenteSubtitulo, ForeColor = UiTheme.Peligro, Location = new Point(650, 18), Text = "Sin paciente seleccionado" };
-        panel.Controls.AddRange(new Control[] { _lblPaciente, _lblDetalle, _lblCita, _lblAlertas });
+        Panel panel = new()
+        {
+            Dock = DockStyle.Fill,
+            BackColor = Color.White,
+            Padding = new Padding(18, 12, 18, 10),
+            Margin = new Padding(0, 0, 0, 8)
+        };
+
+        TableLayoutPanel layout = new()
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 2,
+            RowCount = 1,
+            BackColor = Color.White
+        };
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 58F));
+        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42F));
+
+        TableLayoutPanel datosPaciente = new()
+        {
+            Dock = DockStyle.Fill,
+            ColumnCount = 1,
+            RowCount = 3,
+            BackColor = Color.White
+        };
+        datosPaciente.RowStyles.Add(new RowStyle(SizeType.Absolute, 36F));
+        datosPaciente.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
+        datosPaciente.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
+
+        _lblPaciente = new Label
+        {
+            Dock = DockStyle.Fill,
+            AutoEllipsis = true,
+            Text = "Seleccione un paciente en consulta",
+            Font = new Font("Segoe UI Semibold", 17F, FontStyle.Bold),
+            ForeColor = UiTheme.Primario,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+
+        _lblDetalle = new Label
+        {
+            Dock = DockStyle.Fill,
+            AutoEllipsis = true,
+            Text = "",
+            ForeColor = UiTheme.TextoSecundario,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+
+        _lblCita = new Label
+        {
+            Dock = DockStyle.Fill,
+            AutoEllipsis = true,
+            Text = "",
+            ForeColor = UiTheme.TextoSecundario,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+
+        datosPaciente.Controls.Add(_lblPaciente, 0, 0);
+        datosPaciente.Controls.Add(_lblDetalle, 0, 1);
+        datosPaciente.Controls.Add(_lblCita, 0, 2);
+
+        Panel panelAlertas = new()
+        {
+            Dock = DockStyle.Fill,
+            BackColor = Color.White,
+            Padding = new Padding(8, 0, 0, 0)
+        };
+
+        _lblAlertas = new Label
+        {
+            Dock = DockStyle.Fill,
+            AutoEllipsis = false,
+            AutoSize = false,
+            Height = 96,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Font = UiTheme.FuenteSubtitulo,
+            ForeColor = UiTheme.Peligro,
+            Text = "Sin paciente seleccionado"
+        };
+
+        panelAlertas.Controls.Add(_lblAlertas);
+        layout.Controls.Add(datosPaciente, 0, 0);
+        layout.Controls.Add(panelAlertas, 1, 0);
+        panel.Controls.Add(layout);
+
         return panel;
     }
 
@@ -143,8 +231,8 @@ public sealed class FormAtencionClinica : Form
         ConfigurarBotonFinalizar(false);
         _btnFinalizar.Click += (_, _) => FinalizarConsulta();
         acciones.Controls.Add(_btnFinalizar);
-        Button recetaPdf = UiTheme.CrearBoton("Receta PDF"); recetaPdf.Width = 120; recetaPdf.Click += (_, _) => AvisoPdf();
-        Button resumenPdf = UiTheme.CrearBoton("Resumen PDF"); resumenPdf.Width = 130; resumenPdf.Click += (_, _) => AvisoPdf();
+        Button recetaPdf = UiTheme.CrearBoton("Receta PDF"); recetaPdf.Width = 120; recetaPdf.Click += (_, _) => GenerarRecetaPdf();
+        Button resumenPdf = UiTheme.CrearBoton("Resumen PDF"); resumenPdf.Width = 130; resumenPdf.Click += (_, _) => GenerarResumenPdf();
         acciones.Controls.Add(recetaPdf); acciones.Controls.Add(resumenPdf);
         layout.Controls.Add(acciones, 0, 1);
         return layout;
@@ -160,7 +248,7 @@ public sealed class FormAtencionClinica : Form
     private Control ConstruirEvaluacion()
     {
         TableLayoutPanel grid = CrearFormulario(4, 7);
-        _motivo = CrearTexto(false); _anamnesis = CrearTexto(true); _peso = CrearDecimal(0, 250, 2); _temperatura = CrearDecimal(20, 50, 2);
+        _motivo = CrearTexto(false); _anamnesis = CrearTexto(true); _peso = CrearDecimal(0, 250, 2); _temperatura = CrearDecimal(0, 50, 2);
         _fc = CrearEntero(0, 400); _fr = CrearEntero(0, 300);
         _hidratacion = new ComboBox { Dock = DockStyle.Fill, DropDownStyle = ComboBoxStyle.DropDownList };
         _hidratacion.Items.AddRange(new object[] { "No evaluada", "Normal", "Leve deshidratación", "Moderada", "Severa" }); _hidratacion.SelectedIndex = 0;
@@ -327,7 +415,7 @@ public sealed class FormAtencionClinica : Form
             _lblPaciente.Text = $"{_atencionActual.Mascota}   ·   {_atencionActual.CodigoPaciente}";
             _lblDetalle.Text = $"{_atencionActual.Especie} / {_atencionActual.Raza}   |   {_atencionActual.Sexo}   |   Edad: {_atencionActual.Edad}   |   Peso previo: {(_atencionActual.PesoAnterior.HasValue ? _atencionActual.PesoAnterior.Value.ToString("0.00") + " kg" : "N/R")}   |   Dueño: {_atencionActual.Dueno} / {_atencionActual.Telefono}";
             _lblCita.Text = $"Veterinario: {_atencionActual.Veterinario}   |   Cita: {_atencionActual.FechaHoraCita:dd/MM/yyyy HH:mm}   |   Motivo: {_atencionActual.MotivoConsulta}   |   {_atencionActual.TipoTarifa}: {_atencionActual.PrecioServicioCita:C2}";
-            _lblAlertas.Text = _atencionActual.AlertasActivas > 0 ? $"⚠ ALERTAS CLÍNICAS: {_atencionActual.Alertas}" : "Sin alertas clínicas activas.";
+            _lblAlertas.Text = _atencionActual.AlertasActivas > 0 ? $"⚠ ALERTAS CLÍNICAS:\n{_atencionActual.Alertas}" : "Sin alertas clínicas activas.";
             _lblAlertas.ForeColor = _atencionActual.AlertasActivas > 0 ? UiTheme.Peligro : UiTheme.Acento;
             PrepararBorrador();
             ConfigurarBotonFinalizar(true);
@@ -449,7 +537,249 @@ public sealed class FormAtencionClinica : Form
 
     private static decimal? ValorOpcional(NumericUpDown input) => input.Value > 0 ? input.Value : null;
     private static int? ValorOpcionalEntero(NumericUpDown input) => input.Value > 0 ? decimal.ToInt32(input.Value) : null;
-    private static void AvisoPdf() => MessageBox.Show("La emisión de PDF por ID persistido se habilita en el MACROBLOQUE 5.", "Documentos PDF", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+    private void GenerarResumenPdf()
+    {
+        if (!ValidarPacienteParaPdf()) return;
+
+        using SaveFileDialog dialogo = CrearDialogoPdf($"Resumen_{_atencionActual!.CodigoPaciente}_{DateTime.Now:yyyyMMdd_HHmm}.pdf");
+        if (dialogo.ShowDialog(this) != DialogResult.OK) return;
+
+        try
+        {
+            using PdfWriter writer = new(dialogo.FileName);
+            using PdfDocument pdf = new(writer);
+            using Document doc = new(pdf);
+
+            AgregarTituloPdf(doc, "Resumen de atención clínica");
+            AgregarPacientePdf(doc);
+
+            doc.Add(new Paragraph("Evaluación").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(13));
+            doc.Add(new Paragraph($"Motivo de consulta: {TextoSeguro(_motivo.Text)}"));
+            doc.Add(new Paragraph($"Anamnesis: {TextoSeguro(_anamnesis.Text)}"));
+            doc.Add(new Paragraph($"Peso actual: {ValorPdf(_peso, "kg")}   Temperatura: {ValorPdf(_temperatura, "°C")}"));
+            doc.Add(new Paragraph($"Frecuencia cardiaca: {ValorPdf(_fc, "lpm")}   Frecuencia respiratoria: {ValorPdf(_fr, "rpm")}"));
+            doc.Add(new Paragraph($"Hidratación: {TextoSeguro(_hidratacion.Text)}"));
+            doc.Add(new Paragraph($"Hallazgos físicos: {TextoSeguro(_hallazgos.Text)}"));
+            doc.Add(new Paragraph($"Pronóstico: {TextoSeguro(_pronostico.Text)}"));
+            doc.Add(new Paragraph($"Tratamiento general: {TextoSeguro(_tratamiento.Text)}"));
+
+            AgregarDiagnosticosPdf(doc);
+            AgregarServiciosPdf(doc);
+            AgregarVacunasPdf(doc);
+            AgregarDesparasitacionesPdf(doc);
+            AgregarOrdenesPdf(doc);
+            AgregarCierrePdf(doc);
+
+            AbrirPdf(dialogo.FileName);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "No fue posible generar el resumen PDF", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+    }
+
+    private void GenerarRecetaPdf()
+    {
+        if (!ValidarPacienteParaPdf()) return;
+        if (_recetaDetalles.Count == 0)
+        {
+            MessageBox.Show("Agregue al menos un medicamento antes de generar la receta.", "Receta PDF", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            return;
+        }
+
+        using SaveFileDialog dialogo = CrearDialogoPdf($"Receta_{_atencionActual!.CodigoPaciente}_{DateTime.Now:yyyyMMdd_HHmm}.pdf");
+        if (dialogo.ShowDialog(this) != DialogResult.OK) return;
+
+        try
+        {
+            using PdfWriter writer = new(dialogo.FileName);
+            using PdfDocument pdf = new(writer);
+            using Document doc = new(pdf);
+
+            AgregarTituloPdf(doc, "Receta médica veterinaria");
+            AgregarPacientePdf(doc);
+
+            doc.Add(new Paragraph("Medicamentos indicados").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(13));
+            iText.Layout.Element.Table tabla = new iText.Layout.Element.Table(UnitValue.CreatePercentArray(new float[] { 2.3F, 1.2F, 1.5F, 1.1F, 1.0F, 2.4F })).UseAllAvailableWidth();
+            AgregarEncabezados(tabla, "Medicamento", "Dosis", "Frecuencia", "Duración", "Vía", "Indicaciones");
+            foreach (RecetaDetalleModel item in _recetaDetalles)
+            {
+                tabla.AddCell(TextoSeguro(item.NombreMostrado));
+                tabla.AddCell(TextoSeguro(item.Dosis));
+                tabla.AddCell(TextoSeguro(item.Frecuencia));
+                tabla.AddCell(TextoSeguro(item.Duracion));
+                tabla.AddCell(TextoSeguro(item.ViaAdministracion));
+                tabla.AddCell(TextoSeguro(item.Indicaciones));
+            }
+            doc.Add(tabla);
+
+            doc.Add(new Paragraph("Indicaciones generales").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(13).SetMarginTop(12));
+            doc.Add(new Paragraph(TextoSeguro(_indicacionesReceta.Text)));
+            doc.Add(new Paragraph(" "));
+            doc.Add(new Paragraph("Firma y sello del veterinario: ________________________________"));
+
+            AbrirPdf(dialogo.FileName);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "No fue posible generar la receta PDF", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+    }
+
+    private bool ValidarPacienteParaPdf()
+    {
+        if (_atencionActual is not null) return true;
+        MessageBox.Show("Seleccione un paciente en consulta antes de generar documentos PDF.", "Documentos PDF", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        return false;
+    }
+
+    private static SaveFileDialog CrearDialogoPdf(string nombreArchivo) => new()
+    {
+        Title = "Guardar documento PDF",
+        Filter = "Archivo PDF (*.pdf)|*.pdf",
+        FileName = LimpiarNombreArchivo(nombreArchivo),
+        AddExtension = true,
+        DefaultExt = "pdf",
+        OverwritePrompt = true
+    };
+
+    private static string LimpiarNombreArchivo(string nombre)
+    {
+        foreach (char c in Path.GetInvalidFileNameChars()) nombre = nombre.Replace(c, '_');
+        return nombre;
+    }
+
+    private static void AgregarTituloPdf(Document doc, string titulo)
+    {
+        doc.Add(new Paragraph("Clínica Veterinaria Patitas").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(16).SetTextAlignment(TextAlignment.CENTER));
+        doc.Add(new Paragraph(titulo).SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(14).SetTextAlignment(TextAlignment.CENTER));
+        doc.Add(new Paragraph($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm}").SetFontSize(9).SetTextAlignment(TextAlignment.RIGHT));
+        doc.Add(new Paragraph(" "));
+    }
+
+    private void AgregarPacientePdf(Document doc)
+    {
+        AtencionEncabezadoModel a = _atencionActual!;
+        doc.Add(new Paragraph($"Paciente: {a.Mascota}   Código: {a.CodigoPaciente}").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)));
+        doc.Add(new Paragraph($"Especie/Raza: {a.Especie} / {a.Raza}   Sexo: {a.Sexo}   Edad: {a.Edad}"));
+        doc.Add(new Paragraph($"Dueño: {a.Dueno}   Teléfono: {a.Telefono}"));
+        doc.Add(new Paragraph($"Veterinario: {a.Veterinario}   Cita: {a.FechaHoraCita:dd/MM/yyyy HH:mm}"));
+        doc.Add(new Paragraph($"Alertas clínicas: {(a.AlertasActivas > 0 ? a.Alertas : "Sin alertas activas")}").SetFontSize(10));
+        doc.Add(new Paragraph(" "));
+    }
+
+    private void AgregarDiagnosticosPdf(Document doc)
+    {
+        if (_diagnosticos.Count == 0) return;
+        doc.Add(new Paragraph("Diagnósticos").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(13).SetMarginTop(12));
+        iText.Layout.Element.Table tabla = new iText.Layout.Element.Table(UnitValue.CreatePercentArray(new float[] { 1.2F, 3.2F, 2.4F })).UseAllAvailableWidth();
+        AgregarEncabezados(tabla, "Tipo", "Diagnóstico", "Observaciones");
+        foreach (DiagnosticoModel d in _diagnosticos)
+        {
+            tabla.AddCell(TextoSeguro(d.Tipo));
+            tabla.AddCell(TextoSeguro(d.Descripcion));
+            tabla.AddCell(TextoSeguro(d.Observaciones));
+        }
+        doc.Add(tabla);
+    }
+
+    private void AgregarServiciosPdf(Document doc)
+    {
+        if (_servicios.Count == 0) return;
+        doc.Add(new Paragraph("Servicios y procedimientos").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(13).SetMarginTop(12));
+        iText.Layout.Element.Table tabla = new iText.Layout.Element.Table(UnitValue.CreatePercentArray(new float[] { 2.3F, 3.0F, .8F, 1.1F, 1.1F })).UseAllAvailableWidth();
+        AgregarEncabezados(tabla, "Servicio", "Descripción", "Cant.", "Precio", "Subtotal");
+        foreach (ConsultaServicioModel s in _servicios)
+        {
+            tabla.AddCell(TextoSeguro(s.Servicio));
+            tabla.AddCell(TextoSeguro(s.Descripcion));
+            tabla.AddCell(s.Cantidad.ToString("0.##"));
+            tabla.AddCell(s.PrecioUnitario.ToString("C2"));
+            tabla.AddCell(s.Subtotal.ToString("C2"));
+        }
+        doc.Add(tabla);
+    }
+
+    private void AgregarVacunasPdf(Document doc)
+    {
+        if (_vacunas.Count == 0) return;
+        doc.Add(new Paragraph("Vacunas aplicadas").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(13).SetMarginTop(12));
+        iText.Layout.Element.Table tabla = new iText.Layout.Element.Table(UnitValue.CreatePercentArray(new float[] { 2.0F, 1.2F, 1.5F, 1.5F, 2.0F })).UseAllAvailableWidth();
+        AgregarEncabezados(tabla, "Vacuna", "Dosis", "Fecha", "Próxima", "Observaciones");
+        foreach (VacunaAplicadaModel v in _vacunas)
+        {
+            tabla.AddCell(TextoSeguro(v.Vacuna));
+            tabla.AddCell(TextoSeguro(v.Dosis));
+            tabla.AddCell(v.FechaAplicacion.ToString("dd/MM/yyyy"));
+            tabla.AddCell(v.FechaProximaDosis?.ToString("dd/MM/yyyy") ?? "N/R");
+            tabla.AddCell(TextoSeguro(v.Observaciones));
+        }
+        doc.Add(tabla);
+    }
+
+    private void AgregarDesparasitacionesPdf(Document doc)
+    {
+        if (_desparasitaciones.Count == 0) return;
+        doc.Add(new Paragraph("Desparasitaciones").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(13).SetMarginTop(12));
+        iText.Layout.Element.Table tabla = new iText.Layout.Element.Table(UnitValue.CreatePercentArray(new float[] { 2.0F, 1.2F, 1.5F, 1.5F, 2.0F })).UseAllAvailableWidth();
+        AgregarEncabezados(tabla, "Producto", "Dosis", "Fecha", "Próxima", "Observaciones");
+        foreach (DesparasitacionModel d in _desparasitaciones)
+        {
+            tabla.AddCell(TextoSeguro(d.Desparasitante));
+            tabla.AddCell(TextoSeguro(d.Dosis));
+            tabla.AddCell(d.FechaAplicacion.ToString("dd/MM/yyyy"));
+            tabla.AddCell(d.FechaProxima?.ToString("dd/MM/yyyy") ?? "N/R");
+            tabla.AddCell(TextoSeguro(d.Observaciones));
+        }
+        doc.Add(tabla);
+    }
+
+    private void AgregarOrdenesPdf(Document doc)
+    {
+        if (_ordenes.Count == 0) return;
+        doc.Add(new Paragraph("Órdenes clínicas").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(13).SetMarginTop(12));
+        iText.Layout.Element.Table tabla = new iText.Layout.Element.Table(UnitValue.CreatePercentArray(new float[] { 1.5F, 2.2F, 2.4F, 2.4F })).UseAllAvailableWidth();
+        AgregarEncabezados(tabla, "Tipo", "Estudio", "Motivo", "Observaciones");
+        foreach (OrdenClinicaModel o in _ordenes)
+        {
+            tabla.AddCell(TextoSeguro(o.TipoOrden));
+            tabla.AddCell(TextoSeguro(o.NombreEstudio));
+            tabla.AddCell(TextoSeguro(o.Motivo));
+            tabla.AddCell(TextoSeguro(o.Observaciones));
+        }
+        doc.Add(tabla);
+    }
+
+    private void AgregarCierrePdf(Document doc)
+    {
+        doc.Add(new Paragraph("Cierre e indicaciones").SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD)).SetFontSize(13).SetMarginTop(12));
+        doc.Add(new Paragraph($"Indicaciones: {TextoSeguro(_indicaciones.Text)}"));
+        doc.Add(new Paragraph($"Próxima revisión: {(_proximaRevision.Checked ? _proximaRevision.Value.ToString("dd/MM/yyyy") : "No programada")}"));
+        doc.Add(new Paragraph($"Estado de egreso: {TextoSeguro(_estadoEgreso.Text)}"));
+    }
+
+    private static void AgregarEncabezados(iText.Layout.Element.Table tabla, params string[] encabezados)
+    {
+        foreach (string encabezado in encabezados)
+            tabla.AddHeaderCell(new Cell().Add(new Paragraph(encabezado).SetFont(PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD))));
+    }
+
+    private static string TextoSeguro(string? texto) => string.IsNullOrWhiteSpace(texto) ? "N/R" : texto.Trim();
+    private static string ValorPdf(NumericUpDown input, string unidad) => input.Value > 0 ? $"{input.Value:0.##} {unidad}" : "N/R";
+
+    private static void AbrirPdf(string ruta)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(ruta) { UseShellExecute = true });
+        }
+        catch
+        {
+            MessageBox.Show($"Documento generado en:\n{ruta}", "PDF generado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+    }
+
     private static void QuitarSeleccion<T>(DataGridView grid, BindingList<T> lista) { if (grid.CurrentRow?.DataBoundItem is T item) lista.Remove(item); }
 
     private static TableLayoutPanel CrearFormulario(int columnas, int filas)

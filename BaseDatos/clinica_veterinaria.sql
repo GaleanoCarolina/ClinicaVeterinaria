@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 30-05-2026 a las 00:29:48
+-- Tiempo de generación: 30-05-2026 a las 07:58:44
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,11 +20,14 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `clinica_veterinaria`
 --
+CREATE DATABASE IF NOT EXISTS `clinica_veterinaria` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `clinica_veterinaria`;
 
 DELIMITER $$
 --
 -- Procedimientos
 --
+DROP PROCEDURE IF EXISTS `sp_limpiar_info_clinica`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_limpiar_info_clinica` ()   BEGIN
     IF COALESCE(@CONFIRMAR_BORRADO_TOTAL, '') <> 'SI_BORRAR_TODA_LA_INFO_MENOS_USUARIOS_Y_VETERINARIOS' THEN
         SIGNAL SQLSTATE '45000'
@@ -144,6 +147,7 @@ DELIMITER ;
 -- Estructura de tabla para la tabla `cargos_pendientes`
 --
 
+DROP TABLE IF EXISTS `cargos_pendientes`;
 CREATE TABLE `cargos_pendientes` (
   `id_cargo` bigint(20) UNSIGNED NOT NULL,
   `id_dueno` bigint(20) UNSIGNED NOT NULL,
@@ -160,7 +164,7 @@ CREATE TABLE `cargos_pendientes` (
   `estado` enum('Pendiente','Facturado','Anulado') NOT NULL DEFAULT 'Pendiente',
   `id_factura` bigint(20) UNSIGNED DEFAULT NULL,
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `cargos_pendientes`
@@ -176,6 +180,7 @@ INSERT INTO `cargos_pendientes` (`id_cargo`, `id_dueno`, `id_mascota`, `id_consu
 -- Estructura de tabla para la tabla `catalogo_desparasitantes`
 --
 
+DROP TABLE IF EXISTS `catalogo_desparasitantes`;
 CREATE TABLE `catalogo_desparasitantes` (
   `id_desparasitante` int(10) UNSIGNED NOT NULL,
   `codigo` varchar(25) NOT NULL,
@@ -187,7 +192,7 @@ CREATE TABLE `catalogo_desparasitantes` (
   `controla_inventario` tinyint(1) NOT NULL DEFAULT 1,
   `id_producto_inventario` bigint(20) UNSIGNED DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT 1
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `catalogo_desparasitantes`
@@ -209,6 +214,7 @@ INSERT INTO `catalogo_desparasitantes` (`id_desparasitante`, `codigo`, `nombre`,
 -- Estructura de tabla para la tabla `catalogo_jaulas`
 --
 
+DROP TABLE IF EXISTS `catalogo_jaulas`;
 CREATE TABLE `catalogo_jaulas` (
   `id_jaula` int(10) UNSIGNED NOT NULL,
   `codigo_jaula` varchar(20) NOT NULL,
@@ -239,6 +245,7 @@ INSERT INTO `catalogo_jaulas` (`id_jaula`, `codigo_jaula`, `nombre`, `tipo`, `ub
 -- Estructura de tabla para la tabla `catalogo_medicamentos`
 --
 
+DROP TABLE IF EXISTS `catalogo_medicamentos`;
 CREATE TABLE `catalogo_medicamentos` (
   `id_medicamento` int(10) UNSIGNED NOT NULL,
   `codigo` varchar(25) NOT NULL,
@@ -251,7 +258,7 @@ CREATE TABLE `catalogo_medicamentos` (
   `controla_inventario` tinyint(1) NOT NULL DEFAULT 0,
   `id_producto_inventario` bigint(20) UNSIGNED DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT 1
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `catalogo_medicamentos`
@@ -275,6 +282,7 @@ INSERT INTO `catalogo_medicamentos` (`id_medicamento`, `codigo`, `nombre`, `pres
 -- Estructura de tabla para la tabla `catalogo_servicios`
 --
 
+DROP TABLE IF EXISTS `catalogo_servicios`;
 CREATE TABLE `catalogo_servicios` (
   `id_servicio` int(10) UNSIGNED NOT NULL,
   `codigo` varchar(20) NOT NULL,
@@ -284,7 +292,7 @@ CREATE TABLE `catalogo_servicios` (
   `duracion_minutos` int(11) NOT NULL,
   `genera_cargo` tinyint(1) NOT NULL DEFAULT 1,
   `activo` tinyint(1) NOT NULL DEFAULT 1
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `catalogo_servicios`
@@ -318,6 +326,7 @@ INSERT INTO `catalogo_servicios` (`id_servicio`, `codigo`, `nombre`, `descripcio
 -- Estructura de tabla para la tabla `catalogo_vacunas`
 --
 
+DROP TABLE IF EXISTS `catalogo_vacunas`;
 CREATE TABLE `catalogo_vacunas` (
   `id_vacuna` int(10) UNSIGNED NOT NULL,
   `codigo` varchar(25) NOT NULL,
@@ -329,7 +338,7 @@ CREATE TABLE `catalogo_vacunas` (
   `controla_inventario` tinyint(1) NOT NULL DEFAULT 1,
   `id_producto_inventario` bigint(20) UNSIGNED DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT 1
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `catalogo_vacunas`
@@ -353,6 +362,7 @@ INSERT INTO `catalogo_vacunas` (`id_vacuna`, `codigo`, `nombre`, `especie_aplica
 -- Estructura de tabla para la tabla `citas`
 --
 
+DROP TABLE IF EXISTS `citas`;
 CREATE TABLE `citas` (
   `id_cita` bigint(20) UNSIGNED NOT NULL,
   `id_mascota` bigint(20) UNSIGNED NOT NULL,
@@ -373,7 +383,7 @@ CREATE TABLE `citas` (
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
   `id_usuario_modificacion` int(10) UNSIGNED DEFAULT NULL,
   `fecha_modificacion` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `citas`
@@ -419,6 +429,7 @@ INSERT INTO `citas` (`id_cita`, `id_mascota`, `id_veterinario`, `id_servicio`, `
 -- Estructura de tabla para la tabla `cita_bloques`
 --
 
+DROP TABLE IF EXISTS `cita_bloques`;
 CREATE TABLE `cita_bloques` (
   `id_bloque` bigint(20) UNSIGNED NOT NULL,
   `id_cita` bigint(20) UNSIGNED NOT NULL,
@@ -454,6 +465,7 @@ INSERT INTO `cita_bloques` (`id_bloque`, `id_cita`, `id_veterinario`, `fecha_hor
 -- Estructura de tabla para la tabla `cita_historial_estados`
 --
 
+DROP TABLE IF EXISTS `cita_historial_estados`;
 CREATE TABLE `cita_historial_estados` (
   `id_historial` bigint(20) UNSIGNED NOT NULL,
   `id_cita` bigint(20) UNSIGNED NOT NULL,
@@ -508,6 +520,7 @@ INSERT INTO `cita_historial_estados` (`id_historial`, `id_cita`, `estado_anterio
 -- Estructura de tabla para la tabla `cita_reagendamientos`
 --
 
+DROP TABLE IF EXISTS `cita_reagendamientos`;
 CREATE TABLE `cita_reagendamientos` (
   `id_reagendamiento` bigint(20) UNSIGNED NOT NULL,
   `id_cita` bigint(20) UNSIGNED NOT NULL,
@@ -528,6 +541,7 @@ CREATE TABLE `cita_reagendamientos` (
 -- Estructura de tabla para la tabla `consultas`
 --
 
+DROP TABLE IF EXISTS `consultas`;
 CREATE TABLE `consultas` (
   `id_consulta` bigint(20) UNSIGNED NOT NULL,
   `id_cita` bigint(20) UNSIGNED NOT NULL,
@@ -550,7 +564,7 @@ CREATE TABLE `consultas` (
   `id_usuario_creacion` int(10) UNSIGNED NOT NULL,
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
   `fecha_modificacion` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `consultas`
@@ -581,6 +595,7 @@ INSERT INTO `consultas` (`id_consulta`, `id_cita`, `id_mascota`, `id_veterinario
 -- Estructura de tabla para la tabla `consulta_diagnosticos`
 --
 
+DROP TABLE IF EXISTS `consulta_diagnosticos`;
 CREATE TABLE `consulta_diagnosticos` (
   `id_diagnostico` bigint(20) UNSIGNED NOT NULL,
   `id_consulta` bigint(20) UNSIGNED NOT NULL,
@@ -619,6 +634,7 @@ INSERT INTO `consulta_diagnosticos` (`id_diagnostico`, `id_consulta`, `descripci
 -- Estructura de tabla para la tabla `consulta_servicios`
 --
 
+DROP TABLE IF EXISTS `consulta_servicios`;
 CREATE TABLE `consulta_servicios` (
   `id_consulta_servicio` bigint(20) UNSIGNED NOT NULL,
   `id_consulta` bigint(20) UNSIGNED NOT NULL,
@@ -631,7 +647,7 @@ CREATE TABLE `consulta_servicios` (
   `genera_cargo` tinyint(1) NOT NULL DEFAULT 1,
   `facturado` tinyint(1) NOT NULL DEFAULT 0,
   `fecha_registro` datetime NOT NULL DEFAULT current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `consulta_servicios`
@@ -662,6 +678,7 @@ INSERT INTO `consulta_servicios` (`id_consulta_servicio`, `id_consulta`, `id_ser
 -- Estructura de tabla para la tabla `desparasitaciones`
 --
 
+DROP TABLE IF EXISTS `desparasitaciones`;
 CREATE TABLE `desparasitaciones` (
   `id_desparasitacion` bigint(20) UNSIGNED NOT NULL,
   `id_mascota` bigint(20) UNSIGNED NOT NULL,
@@ -677,7 +694,7 @@ CREATE TABLE `desparasitaciones` (
   `precio_aplicado` decimal(12,2) NOT NULL DEFAULT 0.00,
   `facturado` tinyint(1) NOT NULL DEFAULT 0,
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `desparasitaciones`
@@ -693,6 +710,7 @@ INSERT INTO `desparasitaciones` (`id_desparasitacion`, `id_mascota`, `id_consult
 -- Estructura de tabla para la tabla `duenos`
 --
 
+DROP TABLE IF EXISTS `duenos`;
 CREATE TABLE `duenos` (
   `id_dueno` bigint(20) UNSIGNED NOT NULL,
   `codigo_cliente` varchar(20) NOT NULL,
@@ -735,6 +753,7 @@ INSERT INTO `duenos` (`id_dueno`, `codigo_cliente`, `nombre_completo`, `document
 -- Estructura de tabla para la tabla `facturas`
 --
 
+DROP TABLE IF EXISTS `facturas`;
 CREATE TABLE `facturas` (
   `id_factura` bigint(20) UNSIGNED NOT NULL,
   `numero_factura` varchar(30) NOT NULL,
@@ -756,7 +775,7 @@ CREATE TABLE `facturas` (
   `id_usuario_anulacion` int(10) UNSIGNED DEFAULT NULL,
   `fecha_anulacion` datetime DEFAULT NULL,
   `motivo_anulacion` varchar(500) DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `facturas`
@@ -788,6 +807,7 @@ INSERT INTO `facturas` (`id_factura`, `numero_factura`, `id_dueno`, `id_mascota`
 -- Estructura de tabla para la tabla `factura_detalles`
 --
 
+DROP TABLE IF EXISTS `factura_detalles`;
 CREATE TABLE `factura_detalles` (
   `id_detalle` bigint(20) UNSIGNED NOT NULL,
   `id_factura` bigint(20) UNSIGNED NOT NULL,
@@ -798,7 +818,7 @@ CREATE TABLE `factura_detalles` (
   `precio_unitario` decimal(12,2) NOT NULL,
   `descuento` decimal(12,2) NOT NULL DEFAULT 0.00,
   `subtotal` decimal(12,2) NOT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `factura_detalles`
@@ -830,6 +850,7 @@ INSERT INTO `factura_detalles` (`id_detalle`, `id_factura`, `tipo_item`, `id_ref
 -- Estructura de tabla para la tabla `hospitalizaciones`
 --
 
+DROP TABLE IF EXISTS `hospitalizaciones`;
 CREATE TABLE `hospitalizaciones` (
   `id_hospitalizacion` bigint(20) UNSIGNED NOT NULL,
   `id_mascota` bigint(20) UNSIGNED NOT NULL,
@@ -843,7 +864,7 @@ CREATE TABLE `hospitalizaciones` (
   `estado` enum('Ingresada','En observación','Alta','Cancelada') NOT NULL DEFAULT 'Ingresada',
   `observaciones` text DEFAULT NULL,
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `hospitalizaciones`
@@ -859,6 +880,7 @@ INSERT INTO `hospitalizaciones` (`id_hospitalizacion`, `id_mascota`, `id_consult
 -- Estructura de tabla para la tabla `hospitalizacion_evoluciones`
 --
 
+DROP TABLE IF EXISTS `hospitalizacion_evoluciones`;
 CREATE TABLE `hospitalizacion_evoluciones` (
   `id_evolucion` bigint(20) UNSIGNED NOT NULL,
   `id_hospitalizacion` bigint(20) UNSIGNED NOT NULL,
@@ -872,7 +894,7 @@ CREATE TABLE `hospitalizacion_evoluciones` (
   `medicacion_administrada` text DEFAULT NULL,
   `alimentacion` text DEFAULT NULL,
   `incidencias` text DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `hospitalizacion_evoluciones`
@@ -888,6 +910,7 @@ INSERT INTO `hospitalizacion_evoluciones` (`id_evolucion`, `id_hospitalizacion`,
 -- Estructura de tabla para la tabla `inventario_lotes`
 --
 
+DROP TABLE IF EXISTS `inventario_lotes`;
 CREATE TABLE `inventario_lotes` (
   `id_lote` bigint(20) UNSIGNED NOT NULL,
   `id_producto` bigint(20) UNSIGNED NOT NULL,
@@ -899,7 +922,7 @@ CREATE TABLE `inventario_lotes` (
   `fecha_ingreso` datetime NOT NULL DEFAULT current_timestamp(),
   `proveedor` varchar(150) DEFAULT NULL,
   `estado` enum('Disponible','Agotado','Vencido','Bloqueado') NOT NULL DEFAULT 'Disponible'
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `inventario_lotes`
@@ -927,6 +950,7 @@ INSERT INTO `inventario_lotes` (`id_lote`, `id_producto`, `numero_lote`, `fecha_
 -- Estructura de tabla para la tabla `inventario_movimientos`
 --
 
+DROP TABLE IF EXISTS `inventario_movimientos`;
 CREATE TABLE `inventario_movimientos` (
   `id_movimiento` bigint(20) UNSIGNED NOT NULL,
   `id_producto` bigint(20) UNSIGNED NOT NULL,
@@ -939,7 +963,7 @@ CREATE TABLE `inventario_movimientos` (
   `id_usuario_registro` int(10) UNSIGNED NOT NULL,
   `fecha_registro` datetime NOT NULL DEFAULT current_timestamp(),
   `observaciones` varchar(500) DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `inventario_movimientos`
@@ -967,6 +991,7 @@ INSERT INTO `inventario_movimientos` (`id_movimiento`, `id_producto`, `id_lote`,
 -- Estructura de tabla para la tabla `inventario_productos`
 --
 
+DROP TABLE IF EXISTS `inventario_productos`;
 CREATE TABLE `inventario_productos` (
   `id_producto` bigint(20) UNSIGNED NOT NULL,
   `codigo` varchar(25) NOT NULL,
@@ -979,7 +1004,7 @@ CREATE TABLE `inventario_productos` (
   `stock_minimo` decimal(12,3) NOT NULL DEFAULT 0.000,
   `controla_lotes` tinyint(1) NOT NULL DEFAULT 1,
   `activo` tinyint(1) NOT NULL DEFAULT 1
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `inventario_productos`
@@ -1008,6 +1033,7 @@ INSERT INTO `inventario_productos` (`id_producto`, `codigo`, `nombre`, `categori
 -- Estructura de tabla para la tabla `mascotas`
 --
 
+DROP TABLE IF EXISTS `mascotas`;
 CREATE TABLE `mascotas` (
   `id_mascota` bigint(20) UNSIGNED NOT NULL,
   `codigo_paciente` varchar(20) NOT NULL,
@@ -1028,7 +1054,7 @@ CREATE TABLE `mascotas` (
   `activo` tinyint(1) NOT NULL DEFAULT 1,
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
   `fecha_modificacion` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `mascotas`
@@ -1064,6 +1090,7 @@ INSERT INTO `mascotas` (`id_mascota`, `codigo_paciente`, `id_dueno`, `nombre`, `
 -- Estructura de tabla para la tabla `mascota_alertas_clinicas`
 --
 
+DROP TABLE IF EXISTS `mascota_alertas_clinicas`;
 CREATE TABLE `mascota_alertas_clinicas` (
   `id_alerta` bigint(20) UNSIGNED NOT NULL,
   `id_mascota` bigint(20) UNSIGNED NOT NULL,
@@ -1093,6 +1120,7 @@ INSERT INTO `mascota_alertas_clinicas` (`id_alerta`, `id_mascota`, `tipo_alerta`
 -- Estructura de tabla para la tabla `metodos_pago`
 --
 
+DROP TABLE IF EXISTS `metodos_pago`;
 CREATE TABLE `metodos_pago` (
   `id_metodo_pago` int(10) UNSIGNED NOT NULL,
   `nombre` varchar(80) NOT NULL,
@@ -1118,6 +1146,7 @@ INSERT INTO `metodos_pago` (`id_metodo_pago`, `nombre`, `activo`) VALUES
 -- Estructura de tabla para la tabla `ordenes_clinicas`
 --
 
+DROP TABLE IF EXISTS `ordenes_clinicas`;
 CREATE TABLE `ordenes_clinicas` (
   `id_orden` bigint(20) UNSIGNED NOT NULL,
   `id_consulta` bigint(20) UNSIGNED NOT NULL,
@@ -1133,7 +1162,7 @@ CREATE TABLE `ordenes_clinicas` (
   `resultado_texto` text DEFAULT NULL,
   `ruta_archivo` varchar(350) DEFAULT NULL,
   `id_veterinario` int(10) UNSIGNED NOT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `ordenes_clinicas`
@@ -1150,6 +1179,7 @@ INSERT INTO `ordenes_clinicas` (`id_orden`, `id_consulta`, `tipo_orden`, `nombre
 -- Estructura de tabla para la tabla `pagos`
 --
 
+DROP TABLE IF EXISTS `pagos`;
 CREATE TABLE `pagos` (
   `id_pago` bigint(20) UNSIGNED NOT NULL,
   `id_factura` bigint(20) UNSIGNED NOT NULL,
@@ -1163,7 +1193,7 @@ CREATE TABLE `pagos` (
   `id_usuario_anulacion` int(10) UNSIGNED DEFAULT NULL,
   `fecha_anulacion` datetime DEFAULT NULL,
   `motivo_anulacion` varchar(500) DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `pagos`
@@ -1194,6 +1224,7 @@ INSERT INTO `pagos` (`id_pago`, `id_factura`, `id_metodo_pago`, `fecha_pago`, `m
 -- Estructura de tabla para la tabla `recetas`
 --
 
+DROP TABLE IF EXISTS `recetas`;
 CREATE TABLE `recetas` (
   `id_receta` bigint(20) UNSIGNED NOT NULL,
   `id_consulta` bigint(20) UNSIGNED NOT NULL,
@@ -1222,6 +1253,7 @@ INSERT INTO `recetas` (`id_receta`, `id_consulta`, `fecha_emision`, `indicacione
 -- Estructura de tabla para la tabla `receta_detalles`
 --
 
+DROP TABLE IF EXISTS `receta_detalles`;
 CREATE TABLE `receta_detalles` (
   `id_detalle` bigint(20) UNSIGNED NOT NULL,
   `id_receta` bigint(20) UNSIGNED NOT NULL,
@@ -1235,7 +1267,7 @@ CREATE TABLE `receta_detalles` (
   `cantidad` varchar(80) DEFAULT NULL,
   `via_administracion` varchar(100) DEFAULT NULL,
   `indicaciones` text DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `receta_detalles`
@@ -1256,6 +1288,7 @@ INSERT INTO `receta_detalles` (`id_detalle`, `id_receta`, `id_medicamento`, `med
 -- Estructura de tabla para la tabla `recordatorios`
 --
 
+DROP TABLE IF EXISTS `recordatorios`;
 CREATE TABLE `recordatorios` (
   `id_recordatorio` bigint(20) UNSIGNED NOT NULL,
   `id_mascota` bigint(20) UNSIGNED NOT NULL,
@@ -1291,6 +1324,7 @@ INSERT INTO `recordatorios` (`id_recordatorio`, `id_mascota`, `tipo_recordatorio
 -- Estructura de tabla para la tabla `roles`
 --
 
+DROP TABLE IF EXISTS `roles`;
 CREATE TABLE `roles` (
   `id_rol` int(10) UNSIGNED NOT NULL,
   `nombre` varchar(50) NOT NULL,
@@ -1314,6 +1348,7 @@ INSERT INTO `roles` (`id_rol`, `nombre`, `descripcion`, `activo`) VALUES
 -- Estructura de tabla para la tabla `secuencias_documentos`
 --
 
+DROP TABLE IF EXISTS `secuencias_documentos`;
 CREATE TABLE `secuencias_documentos` (
   `id_secuencia` bigint(20) UNSIGNED NOT NULL,
   `tipo_documento` varchar(20) NOT NULL,
@@ -1334,6 +1369,7 @@ INSERT INTO `secuencias_documentos` (`id_secuencia`, `tipo_documento`, `anio`, `
 -- Estructura de tabla para la tabla `tipos_bloqueo`
 --
 
+DROP TABLE IF EXISTS `tipos_bloqueo`;
 CREATE TABLE `tipos_bloqueo` (
   `id_tipo_bloqueo` int(10) UNSIGNED NOT NULL,
   `nombre` varchar(80) NOT NULL,
@@ -1361,6 +1397,7 @@ INSERT INTO `tipos_bloqueo` (`id_tipo_bloqueo`, `nombre`, `activo`) VALUES
 -- Estructura de tabla para la tabla `usuarios`
 --
 
+DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE `usuarios` (
   `id_usuario` int(10) UNSIGNED NOT NULL,
   `id_rol` int(10) UNSIGNED NOT NULL,
@@ -1391,6 +1428,7 @@ INSERT INTO `usuarios` (`id_usuario`, `id_rol`, `nombre_usuario`, `password_hash
 -- Estructura de tabla para la tabla `vacunas_aplicadas`
 --
 
+DROP TABLE IF EXISTS `vacunas_aplicadas`;
 CREATE TABLE `vacunas_aplicadas` (
   `id_aplicacion` bigint(20) UNSIGNED NOT NULL,
   `id_mascota` bigint(20) UNSIGNED NOT NULL,
@@ -1408,7 +1446,7 @@ CREATE TABLE `vacunas_aplicadas` (
   `precio_aplicado` decimal(12,2) NOT NULL DEFAULT 0.00,
   `facturado` tinyint(1) NOT NULL DEFAULT 0,
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `vacunas_aplicadas`
@@ -1426,6 +1464,7 @@ INSERT INTO `vacunas_aplicadas` (`id_aplicacion`, `id_mascota`, `id_consulta`, `
 -- Estructura de tabla para la tabla `veterinarios`
 --
 
+DROP TABLE IF EXISTS `veterinarios`;
 CREATE TABLE `veterinarios` (
   `id_veterinario` int(10) UNSIGNED NOT NULL,
   `codigo_veterinario` varchar(20) NOT NULL,
@@ -1453,6 +1492,7 @@ INSERT INTO `veterinarios` (`id_veterinario`, `codigo_veterinario`, `id_usuario`
 -- Estructura de tabla para la tabla `veterinario_bloqueos`
 --
 
+DROP TABLE IF EXISTS `veterinario_bloqueos`;
 CREATE TABLE `veterinario_bloqueos` (
   `id_bloqueo` bigint(20) UNSIGNED NOT NULL,
   `id_veterinario` int(10) UNSIGNED NOT NULL,
@@ -1465,7 +1505,7 @@ CREATE TABLE `veterinario_bloqueos` (
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
   `id_usuario_cancelacion` int(10) UNSIGNED DEFAULT NULL,
   `fecha_cancelacion` datetime DEFAULT NULL
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1473,6 +1513,7 @@ CREATE TABLE `veterinario_bloqueos` (
 -- Estructura de tabla para la tabla `veterinario_horarios`
 --
 
+DROP TABLE IF EXISTS `veterinario_horarios`;
 CREATE TABLE `veterinario_horarios` (
   `id_horario` bigint(20) UNSIGNED NOT NULL,
   `id_veterinario` int(10) UNSIGNED NOT NULL,
@@ -1481,7 +1522,7 @@ CREATE TABLE `veterinario_horarios` (
   `hora_fin` time NOT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT 1,
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp()
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `veterinario_horarios`
@@ -1852,13 +1893,13 @@ ALTER TABLE `veterinario_horarios`
 -- AUTO_INCREMENT de la tabla `cargos_pendientes`
 --
 ALTER TABLE `cargos_pendientes`
-  MODIFY `id_cargo` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_cargo` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=372;
 
 --
 -- AUTO_INCREMENT de la tabla `catalogo_desparasitantes`
 --
 ALTER TABLE `catalogo_desparasitantes`
-  MODIFY `id_desparasitante` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_desparasitante` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `catalogo_jaulas`
@@ -1870,25 +1911,25 @@ ALTER TABLE `catalogo_jaulas`
 -- AUTO_INCREMENT de la tabla `catalogo_medicamentos`
 --
 ALTER TABLE `catalogo_medicamentos`
-  MODIFY `id_medicamento` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_medicamento` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT de la tabla `catalogo_servicios`
 --
 ALTER TABLE `catalogo_servicios`
-  MODIFY `id_servicio` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_servicio` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT de la tabla `catalogo_vacunas`
 --
 ALTER TABLE `catalogo_vacunas`
-  MODIFY `id_vacuna` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_vacuna` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `citas`
 --
 ALTER TABLE `citas`
-  MODIFY `id_cita` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_cita` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=278;
 
 --
 -- AUTO_INCREMENT de la tabla `cita_bloques`
@@ -1912,7 +1953,7 @@ ALTER TABLE `cita_reagendamientos`
 -- AUTO_INCREMENT de la tabla `consultas`
 --
 ALTER TABLE `consultas`
-  MODIFY `id_consulta` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_consulta` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=207;
 
 --
 -- AUTO_INCREMENT de la tabla `consulta_diagnosticos`
@@ -1924,13 +1965,13 @@ ALTER TABLE `consulta_diagnosticos`
 -- AUTO_INCREMENT de la tabla `consulta_servicios`
 --
 ALTER TABLE `consulta_servicios`
-  MODIFY `id_consulta_servicio` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_consulta_servicio` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=238;
 
 --
 -- AUTO_INCREMENT de la tabla `desparasitaciones`
 --
 ALTER TABLE `desparasitaciones`
-  MODIFY `id_desparasitacion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_desparasitacion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT de la tabla `duenos`
@@ -1942,49 +1983,49 @@ ALTER TABLE `duenos`
 -- AUTO_INCREMENT de la tabla `facturas`
 --
 ALTER TABLE `facturas`
-  MODIFY `id_factura` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_factura` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=222;
 
 --
 -- AUTO_INCREMENT de la tabla `factura_detalles`
 --
 ALTER TABLE `factura_detalles`
-  MODIFY `id_detalle` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_detalle` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=222;
 
 --
 -- AUTO_INCREMENT de la tabla `hospitalizaciones`
 --
 ALTER TABLE `hospitalizaciones`
-  MODIFY `id_hospitalizacion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_hospitalizacion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `hospitalizacion_evoluciones`
 --
 ALTER TABLE `hospitalizacion_evoluciones`
-  MODIFY `id_evolucion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_evolucion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de la tabla `inventario_lotes`
 --
 ALTER TABLE `inventario_lotes`
-  MODIFY `id_lote` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_lote` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT de la tabla `inventario_movimientos`
 --
 ALTER TABLE `inventario_movimientos`
-  MODIFY `id_movimiento` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_movimiento` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
 
 --
 -- AUTO_INCREMENT de la tabla `inventario_productos`
 --
 ALTER TABLE `inventario_productos`
-  MODIFY `id_producto` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_producto` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT de la tabla `mascotas`
 --
 ALTER TABLE `mascotas`
-  MODIFY `id_mascota` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_mascota` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=310;
 
 --
 -- AUTO_INCREMENT de la tabla `mascota_alertas_clinicas`
@@ -2002,13 +2043,13 @@ ALTER TABLE `metodos_pago`
 -- AUTO_INCREMENT de la tabla `ordenes_clinicas`
 --
 ALTER TABLE `ordenes_clinicas`
-  MODIFY `id_orden` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_orden` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `pagos`
 --
 ALTER TABLE `pagos`
-  MODIFY `id_pago` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_pago` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
 
 --
 -- AUTO_INCREMENT de la tabla `recetas`
@@ -2020,7 +2061,7 @@ ALTER TABLE `recetas`
 -- AUTO_INCREMENT de la tabla `receta_detalles`
 --
 ALTER TABLE `receta_detalles`
-  MODIFY `id_detalle` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_detalle` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT de la tabla `recordatorios`
@@ -2056,7 +2097,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `vacunas_aplicadas`
 --
 ALTER TABLE `vacunas_aplicadas`
-  MODIFY `id_aplicacion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_aplicacion` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT de la tabla `veterinarios`
@@ -2074,7 +2115,7 @@ ALTER TABLE `veterinario_bloqueos`
 -- AUTO_INCREMENT de la tabla `veterinario_horarios`
 --
 ALTER TABLE `veterinario_horarios`
-  MODIFY `id_horario` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id_horario` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- Restricciones para tablas volcadas

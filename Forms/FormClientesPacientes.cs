@@ -1137,7 +1137,7 @@ internal sealed class FormEdicionMascota : Form
         TarifaCalculadaModel ejemplo = politica.Aplicar(100m);
         _tarifaInfo.Text = ejemplo.Recargo == 0
             ? "Tarifa de servicios: convencional, sin recargo."
-            : $"Tarifa de servicios: {politica.TipoTarifa} (+{ejemplo.Recargo:0}% sobre cada $100.00 base).";
+            : $"Tarifa de servicios: {politica.TipoTarifa} (+{ejemplo.Recargo:0}% sobre cada Q100.00 base).";
     }
 
     private void SeleccionarFoto()
